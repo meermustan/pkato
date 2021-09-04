@@ -1,0 +1,155 @@
+{% extends 'base.html' %}
+{% block title %}Pkato |Search {% endblock title %}
+{% block css %}
+<style>
+#home #container-1 {
+        display: flex;
+        justify-content: center;
+    }
+
+    #home #container-1 #search-box {
+        margin: 6px;
+        width: 60%;
+
+    }
+
+    #home #container-1 #search-box input {
+        outline: 0px solid transparent;
+        border: none;
+        border-bottom: 1px solid black;
+        width: 100%;
+    }
+
+    #home #container-1 form #search-filter {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    #home #container-1 #dropdown {
+        margin: 0px 6px;
+    }
+
+    #home .dropdown-menu {
+        min-width: 0;
+        width: 12rem;
+        height: 120px;
+        padding: 4px;
+    }
+
+    .product-pic {
+        width: 100%;
+        max-height: 200px;
+    }
+
+    .product-pic img {
+        padding: 4px;
+        width: 100%;
+        max-height: 200px;
+    }
+
+    #home .card {
+        font-size: 0.8rem;
+        max-width: 230px;
+        height: 460px;
+        margin: 4px 4px;
+    }
+
+    #home .card .card-body {
+        height: 200px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-direction: column;
+    }
+
+    #home #dropdown ul input,
+    #home #dropdown ul label {
+        cursor: pointer;
+    }
+    </style>
+{% endblock css %}
+{% block body %}
+<section id="home">
+    <h5 style="border-bottom: 1px solid red; width:90%;margin: 30px auto;">Search Results..</h5>
+    <div id="container-1">
+        <div id="search-box">
+                <form action="" method="get">
+                    <input type="text" placeholder="Filter Search Results..">
+                </form>
+            </div>
+        <div id="dropdown" class="dropdown">
+            <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton1"
+                data-bs-toggle="dropdown" aria-expanded="false">
+                Filter
+            </button>
+            <ul id="#search-filter" class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                    Women's
+                </label>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheck1">
+                <label class="form-check-label" for="flexCheck1">
+                    Men's
+                </label>
+                <br>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheck2">
+                <label class="form-check-label" for="flexCheck2">
+                    Kid's
+                </label>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheck3">
+                <label class="form-check-label" for="flexCheck3">
+                    Fashion
+                </label>
+                <br>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheck4">
+                <label class="form-check-label" for="flexCheck4">
+                    Latest
+                </label>
+                <input class="form-check-input" type="checkbox" value="" id="flexCheck5">
+                <label class="form-check-label" for="flexCheck5">
+                    Fashion
+                </label>
+                <br>
+
+            </ul>
+        </div>
+    </div>
+    <hr>
+    <div class="container">
+        <div id="featured-content" class="d-flex align-items-center justify-content-center flex-wrap mt-2">
+        {% for items in allProd %}
+            <div class="card">
+                <div class="product-pic">
+                    <img src="/media/{{items.Picture}}" class="card-img-top" alt="...">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{items.Title|truncatechars:20}}</h5>
+                    <p class="card-text">{{items.Description|truncatechars:100}}</p>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex justify-content-evenly align-content-center w-100">
+                    <form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" action="" method="post">{% csrf_token %}
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                    </form>
+                    <b>Rs.{{items.Price}}/Only</b>
+                    </div>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex">
+                    <form  method="get" action="{% url 'Ecommerce:productview' %}">
+                        <input type="hidden" name="product" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Quick View</button>
+                    </form>
+                    <form class="cartItem{{items.id}}" onsubmit="addCartSubmit({{items.id}})" action="">{% csrf_token %}
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Add to Cart</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+</section>
+
+{% endblock body %}
+{% block js %}{% endblock js %}

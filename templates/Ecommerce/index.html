@@ -1,0 +1,275 @@
+{% extends 'base.html' %}
+{% block css %}
+<style>
+    /* Home */
+    #home #main-pic img {
+        width: 100%;
+        max-height: 900px;
+    }
+
+    .product-pic {
+        width: 100%;
+        max-height: 200px;
+    }
+
+    .product-pic img {
+        padding: 4px;
+        width: 100%;
+        max-height: 200px;
+    }
+
+    #home .card {
+        font-size: 0.8rem;
+        max-width: 230px;
+        height: 460px;
+        margin: 4px 4px;
+    }
+
+    #home .card .card-body {
+        height: 200px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-direction: column;
+    }
+    #carousel img {
+        width: auto;
+        max-height: 700px;
+    }
+
+    .cursor-pointer{
+        cursor: pointer;
+    }
+
+    #testimonials img {
+        border: 2px solid black;
+        border-radius: 43px;
+    }
+
+    #testimonials .item {
+        width: 18rem;
+        border: 2px solid black;
+        margin: 4px;
+        border-radius: 12px;
+        background-color: rgb(235, 235, 235);
+    }
+    #massage{
+        width: 100%;
+        position: absolute;
+        display: flex;
+        justify-content:flex-end;
+    }
+    .checked {
+        color: orange;
+    }
+
+    /* Home Ends */
+</style>
+{% endblock css %}
+{% block title %}Pkato|Online Shopping Site{% endblock title %}
+
+{% block body %}
+<section id="home">
+    <div id="massage">
+        {% for message in messages %}
+            <div class="alert {{ message.tags }} alert-dismissible fade show my-2 mx-2" role="alert">
+                {{ message|safe }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    </div>
+    {% load static %}
+    <div id="main-pic">
+        <img class="w-100 " src="{% static 'main-pic.jpg' %}" alt="">
+    </div>
+    <h5 class="mx-5 mt-5">Featured Products<hr style="opacity: 1;"></h5>
+    <div class="container">
+        <hr class="m-0">
+        <div id="featured-content" class="d-flex align-items-center justify-content-center flex-wrap mt-2">
+        {% for items in allProd|slice:"10" %}
+            <div class="card">
+                <div class="product-pic">
+                    <img src="/media/{{items.Picture}}" class="card-img-top" alt="...">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{items.Title|truncatechars:20}}</h5>
+                    <p class="card-text">{{items.Description|truncatechars:100}}</p>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex justify-content-evenly align-content-center w-100">
+                    <form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" action="" method="post">{% csrf_token %}
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                    </form>
+                    <b>Rs.{{items.Price}}/Only</b>
+                    </div>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex">
+                    <form  method="get" action="{% url 'Ecommerce:productview' %}">
+                        <input type="hidden" name="product" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Quick View</button>
+                    </form>
+                    <form class="cartItem{{items.id}}" onsubmit="addCartSubmit({{items.id}})" action="">{% csrf_token %}
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Add to Cart</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% if recommendProd|length >= 5%}
+  <h5 class="mx-5 mt-5">Recommended Products...<hr style="opacity: 1;"></h5>
+    <div class="container">
+        <hr class="m-0">
+        <div id="featured-content" class="d-flex align-items-center justify-content-center flex-wrap mt-2">
+        {% for items in recommendProd %}
+            <div class="card">
+                <div class="product-pic">
+                    <img src="/media/{{items.Picture}}" class="card-img-top" alt="...">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{items.Title|truncatechars:20}}</h5>
+                    <p class="card-text">{{items.Description|truncatechars:100}}</p>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex justify-content-evenly align-content-center w-100">
+                    <form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" action="" method="post">{% csrf_token %}
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                    </form>
+                    <b>Rs.{{items.Price}}/Only</b>
+                    </div>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex">
+                    <form  method="get" action="{% url 'Ecommerce:productview' %}">
+                        <input type="hidden" name="product" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Quick View</button>
+                    </form>
+                    <form class="cartItem{{items.id}}" onsubmit="addCartSubmit({{items.id}})" action="">{% csrf_token %}
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Add to Cart</button>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+{% endif %}
+    <h5 class="mx-5 mt-5">Brands<hr style="opacity: 1;"></h5>
+    <div class="container">
+        {% for items in brands %}
+                {% for item in items %}
+                <h6 class="mt-4">{{item.0.Brand|upper}} BRAND PRODUCTS...</h6>
+                <hr class="m-0">
+                <div id="featured-content" class="d-flex align-items-center justify-content-center flex-wrap mt-2">
+                {% for i in item %}
+                    <div class="card">
+                        <div class="product-pic">
+                            <img src="/media/{{i.Picture}}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{i.Title|truncatechars:20}}</h5>
+                            <p class="card-text">{{i.Description|truncatechars:100}}</p>
+                            <hr style="width: 100%;margin: 0;margin:10px;">
+                            <div class="d-flex justify-content-evenly align-content-center w-100">
+                            <form class="wishItem{{i.id}}" onsubmit="addWishSubmit({{i.id}})" action="" method="post">{% csrf_token %}
+                                <input type="hidden" name="product{{i.id}}" value="{{i.id}}">
+                                <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                            </form>
+                            <b>Rs.{{i.Price}}/Only</b>
+                            </div>
+                            <hr style="width: 100%;margin: 0;margin:10px;">
+                            <div class="d-flex">
+                            <form  method="get" action="{% url 'Ecommerce:productview' %}">
+                                <input type="hidden" name="product" value="{{i.id}}">
+                                <button type='submit' class="btn btn-danger btn-sm mx-1">Quick View</button>
+                            </form>
+                            <form class="cartItem{{i.id}}" onsubmit="addCartSubmit({{i.id}})" action="">{% csrf_token %}
+                                <input type="hidden" name="product{{i.id}}" value="{{i.id}}">
+                                <button type='submit' class="btn btn-danger btn-sm mx-1">Add to Cart</button>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% endfor %}
+                </div>
+        {% endfor %}
+    </div>
+    
+    <div id="carousel" class="container my-4">
+        <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+            
+            <div class="d-flex w-100">
+            <button style="background-color:rgb(0, 0, 0 , 0.03);" class="carousel-control-prev position-relative" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="prev">
+                <i style="color: rgb(0, 0, 0);" class="fa fa-chevron-left fa-lg" aria-hidden="true"></i>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <img src="{% static 'Monitors (1).jpg' %}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'Shoes (5).jpg' %}" class="d-block w-100" alt="...">
+                </div>
+                <div class="carousel-item">
+                    <img src="{% static 'Watches (1).jpg' %}" class="d-block w-100" alt="...">
+                </div>
+            </div>
+            <button style="background-color:rgb(0, 0, 0 , 0.03);" class="carousel-control-next position-relative" type="button" data-bs-target="#carouselExampleIndicators"
+                data-bs-slide="next">
+                    <i style="color: rgb(0, 0, 0);" class="fa fa-chevron-right fa-lg" aria-hidden="true"></i>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+        </div>
+    </div>
+
+
+    <div id="testimonials">
+        <h3 class="text-center my-3">Testimonials</h3>
+        <div class="d-flex  align-items-center justify-content-center flex-wrap  mx-2">
+            <div class="item">
+                <div class="d-flex flex-column align-items-center my-1">
+                    <img src="{% static 'men(1).jpeg' %}" style="width: 60px;height: 60px;" class="card-img-top" alt="...">
+                </div>
+                <div class="d-flex justify-content-center my-1">
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star checked"></span>
+                    <span class="fa fa-star"></span>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Abdur Rehman</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk
+                        of
+                        the card's content.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr style="opacity: 1;width: 60%;margin: auto;">
+
+</section>
+
+{% endblock body %}
+{% block js %}
+<script>
+    alerts = $('.alert')
+    for(i=0;i < alerts.length;i++){
+        if(alerts[i].innerText=="Not Login : We contact you on email."){
+            cart = []
+            localStorage.setItem("Pkato:Cart",JSON.stringify(cart))
+        }
+    }
+    setTimeout(() => {
+    massage=document.getElementById('massage')
+    massage.style.display = 'none'
+    }, 15000);
+ </script>
+
+{% endblock js %}

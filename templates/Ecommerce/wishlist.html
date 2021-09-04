@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+{% block Title %}Pkato|Wish List{% endblock Title %}
+{% block css %}
+    <style>
+    .product-pic {
+        width: 100%;
+        max-height: 200px;
+    }
+
+    .product-pic img {
+        padding: 4px;
+        width: 100%;
+        max-height: 200px;
+    }
+
+    .card {
+        font-size: 0.8rem;
+        max-width: 230px;
+        height: 460px;
+        margin: 4px 4px;
+    }
+
+    .card .card-body {
+        height: 200px;
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        flex-direction: column;
+    }
+    </style>
+{% endblock css %}
+{% block body %}
+{% if user.is_authenticated %}
+        {% if allProd|length != 0 %}
+        <div class="container">
+            <h4 class="text-center">{{user.firstname}}</h4>
+            <div id="featured-content" class="d-flex align-items-center justify-content-center flex-wrap mt-2">
+                {% for items in allProd %}
+                    <div class="card">
+                        <div class="product-pic">
+                            <img src="/media/{{items.Picture}}" class="card-img-top" alt="...">
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title">{{items.Title|truncatechars:20}}</h5>
+                            <p class="card-text">{{items.Description|truncatechars:100}}</p>
+                            <hr style="width: 100%;margin: 0;margin:10px;">
+                            <div class="d-flex justify-content-evenly align-content-center w-100">
+                            <form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" action="" method="post">{% csrf_token %}
+                                <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                                <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                            </form>
+                            <b>Rs.{{items.Price}}/Only</b>
+                            </div>
+                            <hr style="width: 100%;margin: 0;margin:10px;">
+                            <div class="d-flex">
+                            <form  method="get" action="{% url 'Ecommerce:productview' %}">
+                                <input type="hidden" name="product" value="{{items.id}}">
+                                <button type='submit' class="btn btn-danger btn-sm mx-1">Quick View</button>
+                            </form>
+                            <form class="cartItem{{items.id}}" onsubmit="addCartSubmit({{items.id}})" action="">{% csrf_token %}
+                                <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                                <button type='submit' class="btn btn-danger btn-sm mx-1">Add to Cart</button>
+                            </form>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+{% else %}
+    <h4 class="text-center">Wish List Items</h4>
+    <div id="products" class="d-flex align-items-center justify-content-center flex-wrap mt-2"></div>
+{% endif %}
+{% endblock body %}
+{% block js %}
+<script>
+{% for items in allProd %}
+        if (localStorage.getItem("Pkato:WishList") != null ){
+            wishStr = localStorage.getItem("Pkato:WishList");
+            wishArray = JSON.parse(wishStr)
+            for (let items = 0; items < wishArray.length; items++) {
+                if ({{items.id}}==wishArray[items]){
+                    str = ` <div class="card">
+                <div class="product-pic">
+                    <img src="/media/{{items.Picture}}" class="card-img-top" alt="...">
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">{{items.Title|truncatechars:20}}</h5>
+                    <p class="card-text">{{items.Description|truncatechars:100}}</p>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex justify-content-evenly align-content-center w-100">
+                    {% csrf_token %}<form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" action="" method="post" >
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                    </form>
+                    <b>Rs.{{items.Price}}/Only</b>
+                    </div>
+                    <hr style="width: 100%;margin: 0;margin:10px;">
+                    <div class="d-flex">
+                    <form  method="get" action="{% url 'Ecommerce:productview' %}">
+                        <input type="hidden" name="product" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Quick View</button>
+                    </form>
+                    {% csrf_token %}<form class="cartItem{{items.id}}" onsubmit="addCartSubmit({{items.id}})" action="">
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button type='submit' class="btn btn-danger btn-sm mx-1">Add to Cart</button>
+                    </form>
+                    </div>
+                </div>
+            </div>`
+                    $('#products').append(str)
+                }
+            }
+        }
+        else{
+            wish = []
+            localStorage.setItem("Pkato:WishList",JSON.stringify(wish))
+        }
+    {% endfor %}
+    
+
+</script>
+{% endblock js %}

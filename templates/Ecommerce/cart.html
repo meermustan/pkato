@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+{% block css %}
+<style>
+    .picture {
+        max-width: 180px;
+        max-height: 160px;
+    }
+    .cursor-pointer{
+        cursor: pointer;
+    }
+
+    .borderStyle {
+        border: 1px solid rgb(0, 0, 0, .25);
+    }
+
+    @media only screen and (max-device-width: 794px) {
+        #total-details {
+            flex-direction: column-reverse;
+        }
+
+        .fullWidth {
+            width: 100%;
+        }
+    }
+    .hidden{
+        display:none;
+    }
+</style>
+{% endblock css %}
+{% block body %}
+<div id='main' class="container">
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show my-2 mx-2" role="alert">
+            {{ message|safe }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+    <h5 id="totalitems" class="my-4">Total ({{allProd|length }} items)</h5>
+{% if user.is_authenticated %}
+    {% for items in allProd %}
+    <div style="display:flex;" class="flex-wrap borderStyle my-2">
+        <div style="width: 200px;" class="d-flex">
+            {% load static %}
+            <img class="picture p-3" src="/media/{{items.Picture}}" alt="">
+        </div>
+        <div style="width: 100px;" class="my-4">
+        {% if items.Choices|length != 0 %}
+            <div class="dropleft my-2">
+                <a style="background:#dc3545;color:white;" class="btn dropdown-toggle mr-4" href="#" role="button"
+                    id="sizes" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Size
+                </a>
+                <ul style="min-width: 28px;width: 76px;" class="dropdown-menu" aria-labelledby="sizes">
+                    <form action="">
+                        <li style="width: 100px;" class="mx-3 d-flex flex-wrap">
+                            {% for choices in items.Choices %}
+                                    {% for choice in choices %}
+                                    <div class="cursor-pointer" onclick="sizesRadioCheck({{items.id}},{{forloop.parentloop.counter}})">
+                                        <input
+                                            style="background-color: rgb(214, 72, 72);border: 1px solid rgb(214, 72, 72);border-radius: 20%;"
+                                            class="form-check-input mx-1 cursor-pointer sizeradio{{items.id}}" type="radio"
+                                            name="sizeradio" id="{{items.id}}and{{forloop.parentloop.counter}}" {% ifequal forloop.parentloop.counter 1 %}checked{% endifequal %}>
+                                        <label class="form-check-label mx-1 cursor-pointer"
+                                            id="label-size-radio-{{items.id}}and{{forloop.parentloop.counter}}"
+                                            for="{{items.id}}and{{forloop.parentloop.counter}}"> {{choice}}
+                                        </label>
+                                    </div>
+                                    {% endfor %}
+                            {% endfor %}
+                        </li>
+                    </form>
+                </ul>
+            </div>
+        {% endif %}
+        </div>
+
+
+        <div class="d-flex my-3 mx-1 justify-content-evenly">
+            <div style="width:100%;" class="d-flex flex-column my-2">
+                <form class="cursor-pointer text-primary text-decoration-underline" onclick="$('#product{{items.id}}').submit()"  id="product{{items.id}}"  method="get" action="{% url 'Ecommerce:productview' %}">
+                    <input type="hidden" name="product" value="{{items.id}}">
+                    <h5 class="mx-4">{{items.Title|truncatechars:40}}</h5>
+                </form>
+                <hr class="w-75">
+                <div class="mx-4" id="size{{items.id}}">
+                    {% for choices in items.Choices|slice:":1" %}
+                        {% for choice in choices|slice:":1" %}
+                           Size: {{choice}}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
+                <div class="mx-4" id="color{{items.id}}">Color: Black</div>
+                <div class="mx-4" id="quantity{{items.id}}">Quantity: 1</div>
+            </div>
+
+
+            <div>
+                <div class="d-flex mx-2">
+                    <div class="input-group">
+                        <span class="input-group-btn" onclick="decrementQty({{items.id}},{{items.Price}})">
+                            <button type="button" class="quantity-left-minus btn btn-danger btn-number"
+                                data-type="minus" data-field="">
+                                <i class="fa fa-minus"></i>
+                            </button>
+                        </span>
+                        <input type="text" id="quantityInput{{items.id}}" name="quantity"
+                            class="form-control input-number" value="1" min="1" max="5" readonly>
+                        <span class="input-group-btn" onclick="incrementQty({{items.id}},{{items.Price}})">
+                            <button type="button" class="quantity-right-plus btn btn-danger btn-number" data-type="plus"
+                                data-field="">
+                                <i class="fa fa-plus"></i>
+                            </button>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div style="font-size:small;" class="w-100 my-3">
+            <hr>
+            <div class="container d-flex justify-content-evenly">
+                <form id="remove{{items.id}}" method='post' onclick="delItem({{items.id}}),submitDelete({{items.id}})" action="{% url 'Ecommerce:removeItem' %}">{% csrf_token %}
+                    <input name="deleteItem" type="hidden" value="{{items.id}}">
+                    <input name="allItems" class="allItems" type="hidden">
+                    <i  style="color: red;" class="fa fa-trash cursor-pointer mx-2"> REMOVE ITEM</i>
+                </form>
+                <div class="d-flex">
+                    <form id="wishlist{{items.id}}" class="wishItem{{items.id}}" method='post' onclick="addWishSubmit({{items.id}})" action="{% url 'Ecommerce:addwishlist' %}">{% csrf_token %}
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                    </form>
+                    <p class="my-1">WISH LIST</p>
+                </div>
+                <div>
+                    <span><b>Rs.{{items.Price}}/only</b></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+{% else %}
+<div id="products"></div>
+{% endif %}
+    <small>Before checkout , must select the sizes.</small>
+    <hr style="opacity: 1;" class="w-50 mx-auto">
+
+    <div id="total-details" class="d-flex justify-content-between align-items-center my-4 flex-wrap ">
+        <div class="p-4 fullWidth">
+            <h5>Expected Delivery Time.. </h5>
+            <p>Monday 15/02 to Saturday 20/02</p>
+            <h5>We Accept..</h5>
+            <img class="" style="height: 30px;border-radius: 4px;width: 40px;" src="{% static 'visa.svg' %}"
+                alt="Visa Card">
+            <img class="" style="height: 30px;border-radius: 4px;width: 40px;" src="{% static 'bitcoin.svg' %}"
+                alt="Visa Card">
+            <img class="" style="height: 30px;border-radius: 4px;width: 40px;" src="{% static 'american.svg' %}"
+                alt="Visa Card">
+        </div>
+        <div class=" d-flex flex-column borderStyle p-4 fullWidth">
+            <h5 class="my-4">The total amount of</h5>
+            <div id="totalProduct">
+                <form method="post" id="checkout" action="{% url 'Ecommerce:checkout' %}">{% csrf_token %}
+                {% if user.is_authenticated %}
+                {% for items in allProd %}
+                    <div class="d-flex " id="final-{{items.id}}">
+                        <p style="width: 150px;">{{items.Title|truncatechars:10}}</p>
+                        <input name="Item" type="hidden" value="{{items.id}}">
+                        <b class="final-quantity" id="final-quantity-{{items.id}}" style="width: 150px;">Qty:1</b>
+                        <input id="final-quantity-input-{{items.id}}" name="Item{{items.id}}Qty" type="hidden" >
+                        <b class="final-price" id="final-price-{{items.id}}" style="width: 150px;">Rs:{{items.Price}}</b>
+                    </div>
+                {% endfor %}
+                {% endif %}
+                </form>
+            </div>
+            <div class="d-flex">
+                <p style="width: 300px;">Shipping</p>
+                <b style="width: 150px;">Rs.45</b>
+            </div>
+            <hr>
+            <div class="d-flex">
+                <h6 style="width: 300px;">Total amount</h6>
+                <h6 style="width: 150px;"><b id="total-amount"></b></h6>
+            </div>
+            <hr>
+            <div class="mt-4 d-flex">
+                <a style="width: 290px;text-decoration: none;" href="">Add a discount coupoun (optional)</a>
+                <button onclick="document.getElementById('checkout').submit()" style="width: 140px;" class="btn btn-danger">Checkout</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock body %}
+{% block js %}
+<script>
+totalItems = 0;
+notOrdered = $('.hidden')
+if (notOrdered.length != 0){
+    onOrderError();
+}
+function onOrderError(){
+    cart = []
+    for(i=0;i<notOrdered.length;i++){
+        Prods = notOrdered[i].innerText.trim()
+        Prod = JSON.parse(Prods)
+        cart.push(Prod)
+    }
+    newCart = []
+    for (items=0;items<cart.length;items++){
+        remain = cart[items]
+        for(item=0;item<remain.length;item++){
+            console.log(newCart.push(remain[item].toString()))
+        }
+    }
+    console.log(newCart)
+    localStorage.setItem("Pkato:Cart",JSON.stringify(newCart))
+}
+{% if user.is_authenticated %}
+totalPrice();
+{% else %}
+    {% for items in allProd %}
+        if (localStorage.getItem("Pkato:Cart") != null ){
+            cartStr = localStorage.getItem("Pkato:Cart");
+            cartArray = JSON.parse(cartStr)
+            for (let items = 0; items < cartArray.length; items++) {
+                if ({{items.id}}==cartArray[items]){
+                    str = ` <div style="display:flex;" class="flex-wrap borderStyle my-2">
+                                <div style="width: 200px;" class="d-flex">
+                                    {% load static %}
+                                    <img class="picture p-3" src="/media/{{items.Picture}}" alt="">
+                                </div>
+                                <div style="width: 100px;" class="my-4">
+                                {% if items.Choices|length != 0 %}
+                                    <div class="dropleft my-2">
+                                        <a style="background:#dc3545;color:white;" class="btn dropdown-toggle mr-4" href="#" role="button"
+                                            id="sizes" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Size
+                                        </a>
+                                        <ul style="min-width: 28px;width: 76px;" class="dropdown-menu" aria-labelledby="sizes">
+                                            <form action="">
+                                                <li style="width: 100px;" class="mx-3 d-flex flex-wrap">
+                                                    {% for choices in items.Choices %}
+                                                        {% for choice in choices %}
+                                                        <div class="cursor-pointer" onclick="sizesRadioCheck({{items.id}},{{forloop.parentloop.counter}})">
+                                                            <input
+                                                                style="background-color: rgb(214, 72, 72);border: 1px solid rgb(214, 72, 72);border-radius: 20%;"
+                                                                class="form-check-input mx-1 cursor-pointer sizeradio{{items.id}}" type="radio"
+                                                                name="sizeradio" id="{{items.id}}and{{forloop.parentloop.counter}}" {% ifequal forloop.parentloop.counter 1 %}checked{% endifequal %}>
+                                                            <label class="form-check-label mx-1 cursor-pointer"
+                                                                id="label-size-radio-{{items.id}}and{{forloop.parentloop.counter}}"
+                                                                for="{{items.id}}and{{forloop.parentloop.counter}}"> {{choice}}
+                                                            </label>
+                                                        </div>
+                                                        {% endfor %}
+                                                    {% endfor %}
+                                                </li>
+                                            </form>
+                                        </ul>
+                                    </div>
+                                {% endif %}
+                                </div>
+
+
+                                <div class="d-flex my-3 mx-1 justify-content-evenly">
+                                    <div style="width:100%;" class="d-flex flex-column my-2">
+                                        <h5 class="mx-4">{{items.Title|truncatechars:40}}</h5>
+                                        <hr class="w-75">
+                                        <div class="mx-4" id="size{{items.id}}">
+                                            {% for choices in items.Choices|slice:":1" %}
+                                                {% for choice in choices|slice:":1" %}
+                                                Size: {{choice}}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </div>
+                                        <div class="mx-4" id="color{{items.id}}">Color: Black</div>
+                                        <div class="mx-4" id="quantity{{items.id}}">Quantity: 1</div>
+                                    </div>
+
+
+                                    <div>
+                                        <div class="d-flex mx-2">
+                                            <div class="input-group">
+                                                <span class="input-group-btn" onclick="decrementQty({{items.id}},{{items.Price}})">
+                                                    <button type="button" class="quantity-left-minus btn btn-danger btn-number"
+                                                        data-type="minus" data-field="">
+                                                        <i class="fa fa-minus"></i>
+                                                    </button>
+                                                </span>
+                                                <input type="text" id="quantityInput{{items.id}}" name="quantity"
+                                                    class="form-control input-number" value="1" min="1" max="5" readonly>
+                                                <span class="input-group-btn" onclick="incrementQty({{items.id}},{{items.Price}})">
+                                                    <button type="button" class="quantity-right-plus btn btn-danger btn-number" data-type="plus"
+                                                        data-field="">
+                                                        <i class="fa fa-plus"></i>
+                                                    </button>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div style="font-size:small;" class="w-100 my-3">
+                                    <hr>
+                                    <div class="container d-flex justify-content-evenly">
+                                        <form id="remove{{items.id}}" method='post' onclick="delItem({{items.id}}),submitDelete({{items.id}})" action="{% url 'Ecommerce:removeItem' %}">{% csrf_token %}
+                                            <input name="deleteItem" type="hidden" value="{{items.id}}">
+                                            <input name="allItems" class="allItems" type="hidden">
+                                            <i  style="color: red;" class="fa fa-trash cursor-pointer mx-2"> REMOVE ITEM</i>
+                                        </form>
+                                        <div class="d-flex" >
+                                            <form id="wishlist{{items.id}}" class="wishItem{{items.id}}" method='post' onclick="addWishSubmit({{items.id}})" >{% csrf_token %}
+                                                <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                                                <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                                            </form>
+                                            <p class="my-1">WISH LIST</p>
+                                        </div>
+                                        <div>
+                                            <span><b>Rs.{{items.Price}}/only</b></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>`
+                    $('#products').append(str)
+                    str = `
+                    <div class="d-flex " id="final-{{items.id}}">
+                        <p style="width: 150px;">{{items.Title|truncatechars:10}}</p>
+                        <input name="Item" type="hidden" value="{{items.id}}">
+                        <b class="final-quantity" id="final-quantity-{{items.id}}" style="width: 150px;">Qty:1</b>
+                        <input id="final-quantity-input-{{items.id}}" name="Item{{items.id}}Qty" type="hidden" >
+                        <b class="final-price" id="final-price-{{items.id}}" style="width: 150px;">Rs:{{items.Price}}</b>
+                    </div>`
+                    $('#checkout').append(str)
+                }
+                totalItems = items+1
+            }
+            totalPrice();
+            {% if user.is_authenticated %}
+            {% else %}
+            setTotalItems();
+            {% endif %}
+        }
+        else{
+            cart = []
+            localStorage.setItem("Pkato:Cart",JSON.stringify(cart))
+        }
+    {% endfor %}
+{% endif %}
+    function setTotalItems(){
+        total = document.getElementById('totalitems')
+        if (totalItems == 0){
+            total.innerText = `Total (0 items)`
+        }
+        else{
+           total.innerText = `Total (${totalItems} items)` 
+        }
+    }
+    function submitDelete(itemId){
+        document.getElementById(`remove${itemId}`).submit();
+    }
+    function delItem(itemId) {
+        {% if user.is_authenticated != None %}
+            cart = document.getElementsByClassName(`allItems`);
+            cartItems = []
+            if (localStorage.getItem("Pkato:Cart") != null ){
+                cartStr = localStorage.getItem("Pkato:Cart");
+                cartArray = JSON.parse(cartStr)
+                for (let items = 0; items < cartArray.length; items++) {
+                    const element = cartArray[items];
+                    if (element!=itemId){
+                        cartItems.push(element)
+                    }
+                }
+                localStorage.setItem("Pkato:Cart",JSON.stringify(cartItems))
+            }
+            else{
+                cart = []
+                localStorage.setItem("Pkato:Cart",JSON.stringify(cart))
+            }
+            for (i=0;i<cart.length;i++) {
+                cart[i].value = [cartItems];
+            }
+        {% endif %}
+    }
+    function totalPrice() {
+        totalAmount = document.getElementById("total-amount");
+        Price = 45;
+        Products = $('.final-price')
+        {% if user.is_authenticated %}
+            {% for items in allProd %}
+                products{{items.id}} = document.getElementById(`final-price-{{items.id}}`).innerText;
+                Strproducts{{items.id}} = products{{items.id}}.slice(3,)
+                Numproducts{{items.id}} = Number(Strproducts{{items.id}})
+                Price += Numproducts{{items.id}}
+            {% endfor %}
+        {% else %}
+        Price=45;
+        for(i=0;i<Products.length;i++){
+            ProductText = Products[i].innerText
+            Prices = Number(ProductText.slice(3,))
+            Price += Prices
+        }
+        {% endif %}
+        totalAmount.innerText = `Rs.${Price}/only`;
+    }
+
+
+    function incrementQty(itemsId,price) {
+        textValue = document.getElementById(`quantityInput${itemsId}`);
+        increment = Number(textValue.value) + 1;
+        increment = Math.min(5, increment)
+        if (increment == 5) {
+            textValue.style.background = 'rgb(245 185 190)';
+        }
+        textValue.value = increment;
+        document.getElementById(`quantity${itemsId}`).innerText = `Quantity: ${increment}`;
+        document.getElementById(`final-quantity-${itemsId}`).innerText = `Qty:${increment}`;
+        document.getElementById(`final-price-${itemsId}`).innerText = `Rs:${price*increment}`;
+        document.getElementById(`final-quantity-input-${itemsId}`).value = `${increment}`;
+        totalPrice();
+    }
+    function decrementQty(itemsId,price) {
+        textValue = document.getElementById(`quantityInput${itemsId}`);
+        decrement = Number(textValue.value) - 1;
+        decrement = Math.max(1, decrement)
+        textValue.value = decrement;
+        if (decrement != 5) {
+            textValue.style.background = '#e9ecef';
+        }
+        document.getElementById(`quantity${itemsId}`).innerText = `Quantity: ${decrement}`;
+        document.getElementById(`final-quantity-${itemsId}`).innerText = `Qty:${decrement}`;
+        document.getElementById(`final-price-${itemsId}`).innerText = `Rs:${price*decrement}`;
+        document.getElementById(`final-quantity-input-${itemsId}`).value = `${decrement}`;
+        totalPrice();
+    }
+    
+    function submitWishList(ItemId){
+         document.getElementById(`addwishlist${itemId}`).submit();
+    }
+
+
+    function sizesRadioCheck(itemsId, forloop) {
+        sizeCheckBoxes = document.getElementsByClassName(`sizeradio${itemsId}`);
+        sizeCheckBoxes[0].removeAttribute('checked');
+        for (i = 0; i < sizeCheckBoxes.length;) {
+            checking = sizeCheckBoxes[i].checked;
+            if (checking == true) {
+                sizeCheckBoxes[i]
+                labelText = document.getElementById(`label-size-radio-${itemsId}and${forloop}`).innerText;
+                labelText = labelText.trim()
+                document.getElementById(`size${itemsId}`).innerText = `Size: ${labelText}`
+            }
+            i++;
+        }
+
+    }
+
+
+</script>
+{% endblock js %}

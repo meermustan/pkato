@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}
+Pkato|My Profile
+{% endblock title %}
+{% block css %}
+<style>
+body{
+    min-width: 300px;
+}
+#home{
+    height:100vh;
+}
+#home #main{
+    margin-top: 60px;
+}
+#home #container-1{
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    margin:auto;
+}
+#home #container-1 h4{
+    padding:16px;
+    border-bottom:1px solid black;
+}
+#home #container-2{
+    width: 90%;
+    margin: 16px auto;
+}
+#home #container-2 div i{
+    margin-left:12px;
+}
+.cursor-pointer{
+    cursor: pointer;
+}
+</style>
+{% endblock css %}
+{% block body %}
+<section id="home">
+        {% if user.is_authenticated %}
+        <div id="main">
+            {% load static %}
+            <div id="container-1">
+                <h4>{{username}}</h4>
+            </div>
+            <div id="container-2">
+                <div class="cursor-pointer">
+                    Edit Profile
+                    <i class="fa fa-edit"></i>
+                </div>
+                <hr>
+                <div class="cursor-pointer">
+                    <a class="text-decoration-none text-dark" href="{% url 'Ecommerce:wishlist' %}"><i class="fa fa-heart"></i> Wish List</a>
+                </div>
+                <hr>
+                <div class="cursor-pointer ">
+                   <a href="{% url 'Ecommerce:ordereditems' %}" class="text-decoration-none text-dark"><i class="fa fa-shopping-bag"></i> Ordered Items</a> 
+                </div>
+                 <hr>
+                <div class="cursor-pointer">
+                    <i class="fa fa-address-card-o"></i>
+                    Shipping Details
+                    <i class="fa fa-edit"></i>
+                </div>
+                <hr style="opacity: 1;margin: 40px 0px;">
+                <div class="cursor-pointer">
+                    Contact US
+                </div>
+                <hr>
+                <div class="cursor-pointer">
+                    About
+                </div>
+                <hr>
+                <div class="cursor-pointer">
+                    Items Return Policy
+                </div>
+                <br>
+                <div class="cursor-pointer">
+                    <a href="{% url 'Ecommerce:logout' %}" class="btn btn-danger">Logout</a>
+                </div>
+                <br>
+            </div>
+        </div>
+        {% else %}
+        <div class="container">
+            <div class="alert alert-warning alert-dismissible fade show my-2 mx-2" role="alert">
+                <strong>Login Please Otherwise:</strong> May you lost you data.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <h4 class="my-5">Login-in to see your Profile.</h4>
+        </div>
+        {% endif %}
+</section>
+
+{% endblock body %}
+{% block js %}
+<script>
+function getImage(){
+    input = document.getElementById('image-input');
+    input.click()
+}
+done=false;
+function submitImage(){
+    setInterval(() => {
+        input = document.getElementById("image-input").value
+        if (input != "") {
+        document.getElementById("img-form").submit()
+    }
+    }, 1000);
+}
+</script>
+{% endblock js %}

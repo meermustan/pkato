@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% block css %}
+<style>
+    .borderStyle {
+        border: 2px solid black;
+    }
+
+    #details {
+        text-align: justify;
+    }
+
+    #hr-after-pic {
+        display: none;
+    }
+    .images:hover{
+        cursor: pointer;
+        opacity: 0.8;
+        color:black;
+    }
+    #container-1 #col-1 {
+        width: 50%;
+    }
+
+    #container-1 #col-2 {
+        width: 50%;
+    }
+
+    @media only screen and (max-device-width:794px) {
+        #container-1 #col-1 {
+            width: 100%;
+        }
+
+        #container-1 #col-2 {
+            width: 100%;
+        }
+
+        #details {
+            font-size: smaller;
+        }
+
+        #container-1 {
+            flex-direction: column;
+        }
+
+        #hr-after-pic {
+            display: block;
+            opacity: 1;
+        }
+    }
+
+    .checked {
+        color: orange;
+    }
+</style>
+{% endblock css %}
+{% block title %} {% endblock title %}
+{% block body %}
+
+<div class="container my-4">
+    {% load static %}
+    {% for items in allProd %}
+    <div id="container-1" class="d-flex justify-content-center align-items-center">
+        <div id="col-1" class="flex-column d-flex">
+            <div style="align-items: flex-end;" class="d-flex flex-row">
+                <div  class="w-25">
+                    <img id="image-1" src="/media/{{items.Picture2}}" class="img-fluid images" alt="...">
+                </div>
+                <div  class="borderStyle w-100">
+                    <img id="image-2" src="/media/{{items.Picture}}" class="img-fluid activeimg images" alt="...">
+                </div>
+            </div>
+            <div  class="w-25 d-flex">
+                <img id="image-3" src="/media/{{items.Picture3}}" class="img-fluid images" alt="...">
+                <img id="image-4" src="/media/{{items.Picture4}}" class="img-fluid images" alt="...">
+            </div>
+        </div>
+        <div id="col-2">
+            <div class="container">
+                <hr id="hr-after-pic">
+                <h4 class="text-center">{{items.Title}}</h4>
+                <p id="details" style="padding: 4px;" class="">{{items.Description}}</p>
+            </div>
+            <div class="d-flex container justify-content-between">
+                <div class="">Rating 4.0
+                    <div class="d-flex justify-content-center my-1">
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star checked"></span>
+                        <span class="fa fa-star"></span>
+                    </div>
+                </div>
+                <div class=""><b>Rs.4500/only</b></div>
+            </div>
+            <div>
+                <p class="mx-2">Remaning Stock : <b>{{items.Stock}}</b></p>
+            </div>
+            <div class="d-flex my-2 justify-content-around">
+                <div class="d-flex">
+                    {% csrf_token %}<form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" method="post">
+                        <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>
+                    </form>
+                    Wish List
+                </div>
+                <form class="cartItem{{items.id}}" onsubmit="addCartSubmit({{items.id}})" action="">{% csrf_token %}
+                    <input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                    <button type='submit' class="btn btn-danger btn-sm mx-1">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <hr>
+    <h5>Conversation</h5>
+
+</div>
+
+{% endblock body %}
+{% block js %}
+<script>
+$(document).ready(function(){
+    $('.images').click(function () {
+        $(`#${this.id}`).swap('.activeimg');
+        $('.activeimg').removeClass('activeimg')
+        $(`#${this.id}`).addClass('activeimg')
+
+    });
+});
+$.fn.swap = function (elem) {
+    elem = elem.jquery ? elem : $(elem);
+    return this.each(function () {
+        $(document.createTextNode('')).insertBefore(this).before(elem.before(this)).remove();
+    });
+};
+
+</script>
+{% endblock js %}

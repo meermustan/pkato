@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=0.8">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'font-awesome/css/font-awesome.min.css' %}">
+    <link href="{% static 'style.css' %}" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    {% block css %}{% endblock css %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+
+    <title>{% block title %}{% endblock title %}</title>
+</head>
+
+<body>
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-dark bg-red">
+        <div class="container-fluid mx-2">
+            <a class="navbar-brand" href="#" style="border-bottom: 1px solid white;padding-bottom: 0;">PKato</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                <ul class="navbar-nav mz-auto me-4 mb-2 mb-lg-0">
+                    <li class="nav-item ">
+                        <a class="nav-link {% if homeActive %}{{homeActive}}{% endif %}" aria-current="page" href="{% url 'Ecommerce:home' %}">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if productsActive %}{{productsActive}}{% endif %}" aria-current="page" href="{% url 'Ecommerce:products' %}">Latest Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if cartActive %}{{cartActive}}{% endif %}" aria-current="page" href="{% url 'Ecommerce:cart' %}">Cart <i class="fa fa-opencart"></i> </a>
+                    </li>
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if profileActive %}{{profileActive}}{% endif %}" aria-current="page" href="{% url 'Ecommerce:profile' %}">Profile</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if profileActive %}{{profileActive}}{% endif %}" aria-current="page" href="{% url 'Ecommerce:wishlist' %}">Wish List</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'Ecommerce:signup' %}" class=" btn btn-outline-light btn-sm">Sign up</a>
+                        <a href="{% url 'Ecommerce:login' %}" class=" btn btn-outline-light btn-sm">Log in</a>
+                    </li>
+                    {% endif %}
+                    <hr>
+                </ul>
+                <form method="get" action="{% url 'search:home' %}" class="d-flex">
+                    <input class="form-control me-2" name="searchText" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-light " type="submit">Search</button>
+                </form>
+
+            </div>
+        </div>
+    </nav>
+    {% block body %}{% endblock body %}
+    <footer>
+        <div id="content-1">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item" aria-current="page"
+                        style="border-bottom: 1px solid white;padding-bottom: 0;">Pkato</li>
+                </ol>
+            </nav>
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item "><a class="{% if homeActive %}{{homeActive}}{% endif %}" href="{% url 'Ecommerce:home' %}">Home</a></li>
+                    <li class="breadcrumb-item "><a class="{% if productsActive %}{{productsActive}}{% endif %}" href="{% url 'Ecommerce:products' %}">Latest Products</a></li>
+                    <li class="breadcrumb-item "><a class="{% if cartActive %}{{cartActive}}{% endif %}" href="{% url 'Ecommerce:cart' %}">Cart</a></li>
+                    <li class="breadcrumb-item "><a class="{% if profileActive %}{{profileActive}}{% endif %}" href="{% url 'Ecommerce:profile' %}">Profile</a></li>
+                </ol>
+                <hr style="opacity: 1;">
+            </nav>
+
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="">Privicy Policy</a></li>
+                    <li class="breadcrumb-item"><a href="">Contact Us</a></li>
+                </ol>
+            </nav>
+        </div>
+        <hr style="margin: 0;opacity: 1;">
+        <div id="content-2">
+            <p><a href="">Copyright &copy; : www.Pkato.com</a>|All rights reserved 2021</p>
+        </div>
+    </footer>
+    <!-- Optional JavaScript; choose one of the two! -->
+
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+        crossorigin="anonymous"></script>
+        {% block js %}{% endblock js %}
+    <script>
+    onceMsg = false;
+    {% if user.is_authenticated %}
+    {% else %}
+        updateCart();
+    {% endif %}
+    {% for items in allProd %}
+        wishItem = document.getElementsByClassName("wishItem{{items.id}}")
+        cartItem = document.getElementsByClassName("cartItem{{items.id}}")
+        {% if user.is_authenticated %}
+        {% for wishes in wishlist %}
+            if ({{wishes.Wish_List}}=={{items.id}}){
+            str = `<input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                    <button style="border: none;background: none;font-size: 16px;" type="submit" ><i class="fa fa-heart my-1 cursor-pointer"></i></button>`
+                for(i=0;i < wishItem.length ;i++){
+                    wishItem[i].innerHTML = str
+                }
+            }
+        {% endfor %}
+        {% for cart in cartlist %}
+            if ({{cart.Cart}}=={{items.id}}){
+            str = `<i class="fa fa-check-square-o mt-1 mx-2" style="font-size:25px;color:green;"></i>`
+                for(i=0;i < cartItem.length ;i++){
+                    cartItem[i].innerHTML = str
+                }
+            }
+        {% endfor %}
+        {% else %}
+        if (localStorage.getItem("Pkato:Cart") != null ){
+            cartStr = localStorage.getItem("Pkato:Cart")
+            cartArray = JSON.parse(cartStr)
+            for (let items = 0; items < cartArray.length; items++) {
+                const element = cartArray[items];
+                if (cartArray[items]=={{items.id}}){
+                    str = `<i class="fa fa-check-square-o mt-1 mx-2" style="font-size:25px;color:green;"></i>`
+                    for(i=0;i < cartItem.length ;i++){
+                        cartItem[i].innerHTML = str
+                    }
+                }
+            }
+            
+        }
+        else{
+            cart = []
+            localStorage.setItem("Pkato:Cart",JSON.stringify(cart))
+        }
+        if (localStorage.getItem("Pkato:WishList") != null ){
+            wishStr = localStorage.getItem("Pkato:WishList")
+            wishArray = JSON.parse(wishStr)
+            for (let items = 0; items < wishArray.length; items++) {
+                const element = wishArray[items];
+                if (wishArray[items]=={{items.id}}){
+                    str = `<input type="hidden" name="product{{items.id}}" value="{{items.id}}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart my-1 cursor-pointer"></i></button>`
+                    for(i=0;i < wishItem.length ;i++){
+                        wishItem[i].innerHTML = str
+                    }
+                }
+            }
+
+        }
+        else{
+            wish = []
+            localStorage.setItem("Pkato:WishList",JSON.stringify(wish))
+        }
+
+        {% endif %}
+    {% endfor %}
+
+    function addCartSubmit(itemsId) {
+        $('#items').empty();
+        var formData = {
+            'product': $(`input[name=product${itemsId}]`).val(),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        };
+        $.ajax({
+                type: 'POST',
+                url: '/AddCart',
+                data: formData,
+                encode: true
+            })
+            .done(function(data) {
+                data = JSON.parse(data);
+                if (data['status'] == 'success') {
+                    details = data['details'];
+                    product = data['product'];
+                    cart = $(`.cartItem${product}`)
+                        for (i=0;i <cart.length;i++){
+                            str = `<i class="fa fa-check-square-o mt-1 mx-2" style="font-size:25px;color:green;"></i>`
+                            cart[i].innerHTML = str
+                        }
+
+                } else {
+                    if (onceMsg == false){
+                        msg = `<div class="alert alert-warning alert-dismissible fade show my-2 mx-2" role="alert">
+                        <strong>Must Login :</strong> Save items for future.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>`
+                        $('#massage').append(msg);
+                        onceMsg = true;
+
+                    }
+                    product = data['product'];
+                    if (localStorage.getItem("Pkato:Cart") != null ){
+                        cartStr = localStorage.getItem("Pkato:Cart");
+                        cartArray = JSON.parse(cartStr)
+                        add=true;
+                        for (let items = 0; items < cartArray.length; items++) {
+                            const element = cartArray[items];
+                            if (element == product) {
+                                add = false;
+                            }
+                        }
+                        if (add == true) {
+                            cartArray.push(product)
+                            localStorage.setItem("Pkato:Cart",JSON.stringify(cartArray))
+                        }
+                    }
+                    else{
+                        cart = []
+                        cart.push(product)
+                        localStorage.setItem("Pkato:Cart",JSON.stringify(cart))
+                    }
+                    product = data['product'];
+                    cart = $(`.cartItem${product}`)
+                    for (i=0;i <cart.length;i++){
+                        str = `<i class="fa fa-check-square-o mt-1 mx-2" style="font-size:25px;color:green;"></i>`
+                        cart[i].innerHTML = str
+                    }
+                    clearTimeout(addCartSubmit);
+                    updateCart();
+                    
+                }
+            });
+        event.preventDefault();
+    };
+
+    function addWishSubmit(itemsId) {
+        $('#items').empty();
+        var formData = {
+            'product': $(`input[name=product${itemsId}]`).val(),
+            'csrfmiddlewaretoken': $('input[name=csrfmiddlewaretoken]').val()
+        };
+        $.ajax({
+                type: 'POST',
+                url: '/AddWishList',
+                data: formData,
+                encode: true
+            })
+            .done(function(data) {
+                data = JSON.parse(data);
+                if (data['status'] == 'success') {
+                    details = data['details'];
+                    product = data['product'];
+                    wishItem = $(`.wishItem${product}`).empty();
+                    if (data['item'] == 'add') {
+                        wishItem.append(`<input type="hidden" name="product${product}" value="${product}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart my-1 cursor-pointer"></i></button>`)
+                    }
+                    else{
+                        wishItem.append(`<input type="hidden" name="product${product}" value="${product}">
+                        <button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>`)
+                    }
+                } else {
+                    if (onceMsg == false){
+                        msg = `<div class="alert alert-warning alert-dismissible fade show my-2 mx-2" role="alert">
+                        <strong>Must Login :</strong> Save items for future.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>`
+                        $('#massage').append(msg);
+                        onceMsg = true;
+                    }
+                    product = data['product'];
+                    add=true;
+                    if (localStorage.getItem("Pkato:WishList") != null ){
+                        wishStr = localStorage.getItem("Pkato:WishList");
+                        wishArray = JSON.parse(wishStr)
+                        wish_list = [];
+                        for (let items = 0; items < wishArray.length; items++) {
+                            const element = wishArray[items];
+                            if (element == product) {
+                                index = wishArray.indexOf(product)
+                                wishArray.slice(index,1)
+                                add=false;
+                            }
+                            else{
+                                wish_list.push(element)
+                            }
+                        }
+                        if (add==true) {
+                            wishArray.push(product)
+                            localStorage.setItem("Pkato:WishList",JSON.stringify(wishArray))
+                        }
+                        else{
+                            localStorage.setItem("Pkato:WishList",JSON.stringify(wish_list))
+                        }
+                    }
+                    else{
+                        add=true;
+                        wish_list = [];
+                        wish_list.push(product)
+                        localStorage.setItem("Pkato:WishList",JSON.stringify(wish_list))
+                    }
+                    wishItem = $(`.wishItem${product}`).empty();
+
+                    if (add==true) {
+                        wishItem.append(`<input type="hidden" name="product${product}" value="${product}"><button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart my-1 cursor-pointer"></i></button>`)
+                    }
+                    else{
+                        wishItem.append(`<input type="hidden" name="product${product}" value="${product}"><button style="border: none;background: none;font-size: 16px;" type="submit"><i class="fa fa-heart-o my-1 cursor-pointer"></i></button>`)
+                    }
+
+                    clearTimeout(addWishSubmit);
+                    
+                }
+            });
+        event.preventDefault();
+    };
+
+    function cartSubmit(params) {
+        document.getElementById("form-cart").submit();
+    }
+    function updateCart() {
+        cart = document.getElementById('cart');
+        cartItems = []
+        if (localStorage.getItem("Pkato:Cart") != null ){
+            cartStr = localStorage.getItem("Pkato:Cart");
+            cartArray = JSON.parse(cartStr)
+            for (let items = 0; items < cartArray.length; items++) {
+                const element = cartArray[items];
+                cartItems.push(element)
+            }
+        }
+        else{
+            cart = []
+            localStorage.setItem("Pkato:Cart",JSON.stringify(cart))
+        }
+    }
+    </script>
+
+    <!-- Option 2: Separate Popper and Bootstrap JS -->
+    <!--
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js" integrity="sha384-SR1sx49pcuLnqZUnnPwx6FCym0wLsk5JZuNx2bPPENzswTNFaQU1RDvt3wT4gWFG" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.min.js" integrity="sha384-j0CNLUeiqtyaRmlzUHCPZ+Gy5fQu0dQ6eZ/xAww941Ai1SxSY+0EQqNXNE6DZiVc" crossorigin="anonymous"></script>
+    -->
+</body>
+</html>
