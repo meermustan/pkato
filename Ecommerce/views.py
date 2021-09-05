@@ -54,7 +54,7 @@ def home(request):
         recommendedProds = random.sample(recommendedProds,5)
     allProd = Product.objects.all().order_by('-Pub_Date')
     prams = {'homeActive':'active','allProd':allProd,'wishlist':wishlist,'cartlist':cartlist,'brands':Totalbrands,"recommendProd":recommendedProds}
-    return render(request,'Ecommerce/index.html',prams)
+    return render(request,'index.html',prams)
 
 def products(request):
     if request.user.is_authenticated:
