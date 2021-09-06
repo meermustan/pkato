@@ -11,7 +11,6 @@
     }
 
     #container-1 {
-        height: 80vh;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -19,6 +18,13 @@
 
     #illustration {
         width: 100%;
+    }
+
+    #massage{
+        width: 100%;
+        position: absolute;
+        display: flex;
+        justify-content:flex-end;
     }
 
     @media only screen and (max-device-width:780px) {
@@ -39,6 +45,15 @@
 {% block title %}Pkato|User Log-in{% endblock title %}
 {% block body %}
 <h4 class="text-center my-5">Signup Now</h4>
+<div id="massage">
+    {% for message in messages %}
+        <div class="alert {{ message.tags }} alert-dismissible fade show my-2 mx-2" role="alert">
+            {{ message|safe }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+</div>
+<div style="height: 100px;"></div>
 <div id="container-1" class="mx-4">
     <div id="illustration" class="my-4">
         {% load static %}
@@ -49,31 +64,30 @@
             <div class="mb-3 d-flex justify-content-between ">
                 <div style="margin-right: 2px;" class="w-100">
                     <label for="first-name" class="form-label">First Name</label>
-                    <input placeholder="First Name" name="first-name" type="text" class="form-control " id="first-name">
+                    <input placeholder="First Name" name="first-name" type="text" class="form-control " id="first-name" required>
                 </div>
                 <div style="margin-left: 2px;" class="w-100">
                     <label for="last-name" class="form-label">Last Name</label>
-                    <input placeholder="Last Name" name="last-name" type="text" class="form-control " id="last-name">
+                    <input placeholder="Last Name" name="last-name" type="text" class="form-control " id="last-name" required>
                 </div>
             </div>
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Email address</label>
-                <input type="email" placeholder="example@gmail.com" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp">
+                <input type="email" placeholder="example@gmail.com" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required>
                 <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
             </div>
             <div class="mb-3 w-100">
                 <label for="password" class="form-label">Password</label>
-                <input type="password" name="password" placeholder="Password" class="form-control" id="password">
+                <input type="password" name="password" placeholder="Password" class="form-control" id="password" required>
             </div>
             <div class="mb-3 w-100">
                 <label for="confirm-password" class="form-label">Confirm Password</label>
-                <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control" id="confirm-password">
+                <input type="password" name="confirm-password" placeholder="Confirm Password" class="form-control" id="confirm-password" required>
             </div>
             <div class="d-flex justify-content-end w-100">
                 <button type="submit" class="btn btn-danger">Submit</button>
             </div>
         </form>
-
     </div>
 </div>
 </div>

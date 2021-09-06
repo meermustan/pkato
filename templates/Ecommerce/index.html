@@ -21,8 +21,9 @@
     #home .card {
         font-size: 0.8rem;
         max-width: 230px;
-        height: 460px;
+        height: 380px;
         margin: 4px 4px;
+        width: 205px;
     }
 
     #home .card .card-body {
@@ -31,6 +32,7 @@
         justify-content: flex-end;
         align-items: center;
         flex-direction: column;
+        padding: 15px 4px;
     }
     #carousel img {
         width: auto;
@@ -92,8 +94,7 @@
                     <img src="/media/{{items.Picture}}" class="card-img-top" alt="...">
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">{{items.Title|truncatechars:20}}</h5>
-                    <p class="card-text">{{items.Description|truncatechars:100}}</p>
+                    <h5 class="card-title">{{items.Title|truncatechars:30}}</h5>
                     <hr style="width: 100%;margin: 0;margin:10px;">
                     <div class="d-flex justify-content-evenly align-content-center w-100">
                     <form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" action="" method="post">{% csrf_token %}
@@ -130,7 +131,7 @@
                 </div>
                 <div class="card-body">
                     <h5 class="card-title">{{items.Title|truncatechars:20}}</h5>
-                    <p class="card-text">{{items.Description|truncatechars:100}}</p>
+                    <!-- <p class="card-text">{{items.Description|truncatechars:100}}</p> -->
                     <hr style="width: 100%;margin: 0;margin:10px;">
                     <div class="d-flex justify-content-evenly align-content-center w-100">
                     <form class="wishItem{{items.id}}" onsubmit="addWishSubmit({{items.id}})" action="" method="post">{% csrf_token %}
@@ -170,7 +171,7 @@
                         </div>
                         <div class="card-body">
                             <h5 class="card-title">{{i.Title|truncatechars:20}}</h5>
-                            <p class="card-text">{{i.Description|truncatechars:100}}</p>
+                            <!-- <p class="card-text">{{i.Description|truncatechars:100}}</p> -->
                             <hr style="width: 100%;margin: 0;margin:10px;">
                             <div class="d-flex justify-content-evenly align-content-center w-100">
                             <form class="wishItem{{i.id}}" onsubmit="addWishSubmit({{i.id}})" action="" method="post">{% csrf_token %}

@@ -54,7 +54,7 @@ def home(request):
         recommendedProds = random.sample(recommendedProds,5)
     allProd = Product.objects.all().order_by('-Pub_Date')
     prams = {'homeActive':'active','allProd':allProd,'wishlist':wishlist,'cartlist':cartlist,'brands':Totalbrands,"recommendProd":recommendedProds}
-    return render(request,'index.html',prams)
+    return render(request,'Ecommerce/index.html',prams)
 
 def products(request):
     if request.user.is_authenticated:
@@ -327,13 +327,29 @@ def handleSignup(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         cPassword = request.POST.get('confirm-password')
+        try:
+            if password == cPassword:
+                myuser = User.objects.create_user(email,email,password)
+                myuser.first_name = firstName
+                myuser.last_name = lastName
+                myuser.save()
+                messages.success(request, '<strong>Signup :</strong> Account is successfully created.')
+                return redirect("/")
+            else:
+                messages.error(request, "<strong>Signup :</strong> Password and Confirm Password not match.")
+                return redirect("/Signup")
+        except:
+            messages.error(request, '<strong>Signup :</strong> Account already exists.')
+            return redirect("/Login")
         # I choose username as a email because email is also a unique.
-        myuser = User.objects.create_user(email,email,password)
-        myuser.first_name = firstName
-        myuser.last_name = lastName
-        myuser.save()
-        messages.success(request, '<strong>Signup :</strong>Account is successfully created.')
-        return redirect("/")
+        # check_user = authenticate(username=email)
+        # if check_user is not None:
+        # new_user = User.objects.create_user(username=email, email=email, password=password)
+        # new_user = new_user.save(commit=False)
+        # myuser = User.objects.create_user(email,email,password)
+        # myuser.first_name = firstName
+        # myuser.last_name = lastName
+        # myuser.save()
     return render(request, 'account/signup.html') 
 
 def handleLogin(request):
