@@ -129,12 +129,6 @@ MESSAGE_TAGS = {
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> a4db5cd4fd71e5d9662f860851cb3402e88dc970
 MEDIA_ROOT= BASE_DIR / 'media'
 MEDIA_URL="/media/"
 
