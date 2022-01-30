@@ -25,7 +25,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # '127.0.0.1'
-ALLOWED_HOSTS = ['pkato.herokuapp.com','localhost']
+ALLOWED_HOSTS = ['pkato.herokuapp.com','localhost','pkato-git.herokuapp.com']
 
 
 # Application definition
@@ -129,9 +129,12 @@ MESSAGE_TAGS = {
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> a4db5cd4fd71e5d9662f860851cb3402e88dc970
 MEDIA_ROOT= BASE_DIR / 'media'
 MEDIA_URL="/media/"
 
