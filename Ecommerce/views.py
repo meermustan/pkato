@@ -55,6 +55,7 @@ def home(request):
     allProd = Product.objects.all().order_by('-Pub_Date')
     prams = {'homeActive':'active','allProd':allProd,'wishlist':wishlist,'cartlist':cartlist,'brands':Totalbrands,"recommendProd":recommendedProds}
     return render(request,'Ecommerce/index.html',prams)
+    
 
 def products(request):
     if request.user.is_authenticated:
@@ -369,3 +370,7 @@ def handleLogin(request):
 def handleLogout(request):
     logout(request)
     return redirect('/')
+
+
+def error_404(request, exception):
+    return render(request, '404.html')
