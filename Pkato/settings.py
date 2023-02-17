@@ -25,7 +25,7 @@ SECRET_KEY = os.environ['SECRET_KEY']
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 # '127.0.0.1'
-ALLOWED_HOSTS = ['pkato.herokuapp.com','localhost','pkato-git.herokuapp.com']
+ALLOWED_HOSTS = ['pkato.herokuapp.com','localhost','pkato-git.herokuapp.com','pkato.up.railway.app','www.pkato.up.railway.app']
 
 
 # Application definition
